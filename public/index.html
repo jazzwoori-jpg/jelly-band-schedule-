@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>젤리합주일정잡기</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap">
+<style>
+:root{
+  --bg:#FFF6E4;
+  --surface:#FFFFFF;
+  --surface-2:#FFE9F3;
+  --text:#4A1942;
+  --text-muted:#9A7291;
+  --border:#FFDCEC;
+  --accent:#FF5DA2;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#FFE2F0;
+  --available:#2FBE8F;
+  --available-soft:#DDF7EC;
+  --partial:#F2A200;
+  --partial-soft:#FFEFC7;
+  --unavailable:#FF6B7A;
+  --unavailable-soft:#FFE3E6;
+  --sun:#FF6B7A;
+  --sat:#3DA9E0;
+  --gold:#FFCC29;
+  --shadow:0 10px 26px rgba(255,93,162,.22);
+  --radius-s:12px;
+  --radius-m:18px;
+  --radius-l:26px;
+  font-family:'Noto Sans KR','Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#241129;
+    --surface:#341A3D;
+    --surface-2:#432349;
+    --text:#FFEEFA;
+    --text-muted:#CBA6C6;
+    --border:#573460;
+    --accent:#FF7FB8;
+    --accent-ink:#241129;
+    --accent-soft:#4E2A55;
+    --available:#5FE0B3;
+    --available-soft:#1F4A3C;
+    --partial:#FFCB4D;
+    --partial-soft:#4A3A17;
+    --unavailable:#FF8B92;
+    --unavailable-soft:#4A2530;
+    --sun:#FF8B92;
+    --sat:#79CBFF;
+    --gold:#FFDE6E;
+    --shadow:0 10px 26px rgba(0,0,0,.45);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#241129;
+  --surface:#341A3D;
+  --surface-2:#432349;
+  --text:#FFEEFA;
+  --text-muted:#CBA6C6;
+  --border:#573460;
+  --accent:#FF7FB8;
+  --accent-ink:#241129;
+  --accent-soft:#4E2A55;
+  --available:#5FE0B3;
+  --available-soft:#1F4A3C;
+  --partial:#FFCB4D;
+  --partial-soft:#4A3A17;
+  --unavailable:#FF8B92;
+  --unavailable-soft:#4A2530;
+  --sun:#FF8B92;
+  --sat:#79CBFF;
+  --gold:#FFDE6E;
+  --shadow:0 10px 26px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{background:var(--bg);color:var(--text);margin:0;padding-inline:0;}
+#app{display:flex;flex-direction:column;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0px);}
+button{font-family:inherit;transition:transform .1s cubic-bezier(.34,1.56,.64,1), background-color .12s ease, border-color .12s ease;}
+button:active{transform:scale(.93);}
+input{font-family:inherit;}
+.mono{font-family:'Baloo 2','Noto Sans KR',monospace;font-variant-numeric:tabular-nums;}
+.display{font-family:'Jua','Noto Sans KR',sans-serif;}
+
+.topbar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:20;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 18px;background:var(--bg);border-bottom:1px solid var(--border);
+}
+.topbar .brand{display:flex;flex-direction:column;line-height:1.15;}
+.topbar .brand b{font-family:'Jua','Noto Sans KR',sans-serif;font-size:18px;letter-spacing:.2px;}
+.topbar .brand span{font-size:11px;color:var(--text-muted);}
+.topbar .who{display:flex;align-items:center;gap:8px;}
+.topbar .who .tag{font-size:12px;color:var(--text-muted);}
+.linklike{background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:6px 4px;}
+
+.screen{flex:1;display:flex;flex-direction:column;padding:16px;gap:16px;width:100%;max-width:520px;margin:0 auto;}
+.center-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 20px;gap:22px;text-align:center;max-width:440px;margin:0 auto;width:100%;}
+.glow{
+  position:relative;width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle at 50% 40%, var(--accent-soft), transparent 70%);
+  display:flex;align-items:center;justify-content:center;margin-bottom:-8px;
+}
+.glow svg{width:52px;height:52px;color:var(--accent);}
+.hero-title{font-family:'Jua','Noto Sans KR',sans-serif;font-size:30px;line-height:1.3;letter-spacing:.2px;}
+.hero-sub{color:var(--text-muted);font-size:14px;line-height:1.6;max-width:340px;}
+.field{width:100%;}
+.field input{
+  width:100%;padding:15px 16px;border-radius:var(--radius-m);border:1.5px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:16px;outline:none;
+}
+.field input:focus{border-color:var(--accent);}
+.field label{display:block;font-size:12.5px;color:var(--text-muted);margin-bottom:6px;}
+.field textarea{
+  width:100%;padding:13px 14px;border-radius:var(--radius-m);border:1.5px solid var(--border);
+  background:var(--surface);color:var(--text);font-size:14px;outline:none;font-family:inherit;resize:vertical;line-height:1.5;
+}
+.field textarea:focus{border-color:var(--accent);}
+.btn{
+  border:none;border-radius:999px;padding:15px 20px;font-size:15px;font-weight:700;
+  cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+  transition:transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .12s ease, opacity .12s ease;
+}
+.btn:active{transform:scale(.95);}
+.btn-primary{background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 0 color-mix(in srgb, var(--accent) 70%, black);}
+.btn-primary:active{box-shadow:0 1px 0 0 color-mix(in srgb, var(--accent) 70%, black);}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-ghost{background:var(--surface-2);color:var(--text);}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+.btn-row{display:flex;flex-direction:column;gap:10px;width:100%;}
+.err-text{color:var(--unavailable);font-size:13px;min-height:16px;}
+
+.month-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.month-nav .month-title{
+  font-family:'Jua','Noto Sans KR',sans-serif;font-size:20px;background:none;border:none;
+  color:var(--text);cursor:pointer;padding:6px 10px;border-radius:var(--radius-s);
+}
+.month-nav .month-title:hover{background:var(--surface-2);}
+.nav-btn{
+  width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);
+  color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;
+}
+.nav-btn svg{width:16px;height:16px;}
+
+.quickjump{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:14px;box-shadow:var(--shadow);}
+.qj-year{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px;}
+.qj-year b{font-family:'Jua','Noto Sans KR',sans-serif;font-size:18px;}
+.qj-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.qj-grid button{padding:10px 0;border-radius:var(--radius-s);border:1.5px solid var(--border);background:var(--surface-2);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;}
+.qj-grid button.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+
+.weekday-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:2px 0;}
+.weekday-row div{text-align:center;font-size:12px;font-weight:600;color:var(--text-muted);}
+.weekday-row div.sun{color:var(--sun);}
+.weekday-row div.sat{color:var(--sat);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-cell{
+  aspect-ratio:1;border-radius:var(--radius-s);border:1.5px solid var(--border);background:var(--surface);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;
+  padding:2px;position:relative;transition:transform .1s cubic-bezier(.34,1.56,.64,1);
+}
+.cal-cell:active{transform:scale(.9);}
+.cal-cell.empty{visibility:hidden;pointer-events:none;}
+.cal-cell .num{font-size:13px;font-weight:600;}
+.cal-cell.sun .num{color:var(--sun);}
+.cal-cell.sat .num{color:var(--sat);}
+.cal-cell.today{border-color:var(--accent);border-width:2px;}
+.cal-cell .dot{width:7px;height:7px;border-radius:50%;}
+.cal-cell.st-full{background:var(--available-soft);}
+.cal-cell.st-partial{background:var(--partial-soft);}
+.cal-cell.st-none{background:var(--unavailable-soft);}
+.cal-cell.st-full .dot{background:var(--available);}
+.cal-cell.st-partial .dot{background:var(--partial);}
+.cal-cell.st-none .dot{background:var(--unavailable);}
+.cal-cell .hrs{font-size:8.5px;color:var(--text-muted);}
+.cal-cell.common-hit{background:var(--available-soft);border-color:var(--gold);border-width:2.5px;}
+.cal-cell.common-partial{background:var(--partial-soft);border-color:var(--partial);border-width:2px;}
+.cal-cell.common-miss{background:var(--surface-2);}
+.cal-cell .common-label{font-size:8.5px;font-weight:700;text-align:center;line-height:1.15;}
+.cal-cell.common-hit .common-label{color:var(--available);}
+.cal-cell.common-partial .common-label{color:var(--partial);}
+.cal-cell.common-miss .common-label{color:var(--text-muted);}
+
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-muted);}
+.legend span{display:inline-flex;align-items:center;gap:5px;}
+.legend i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.summary-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:16px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.summary-row{display:flex;align-items:center;justify-content:space-between;}
+.summary-stats{display:flex;gap:16px;}
+.stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.stat b{font-family:'Baloo 2',monospace;font-size:18px;}
+.stat span{font-size:11px;color:var(--text-muted);}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;}
+.badge.done{background:var(--available-soft);color:var(--available);}
+.badge.pending{background:var(--surface-2);color:var(--text-muted);}
+
+.bottom-bar{
+  position:sticky;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(to top, var(--bg) 60%, transparent);
+  max-width:520px;margin:0 auto;width:100%;
+}
+
+.sheet-backdrop{
+  position:fixed;inset:0;background:rgba(20,16,8,.45);z-index:40;
+  display:flex;align-items:flex-end;justify-content:center;
+}
+.sheet{
+  width:100%;max-width:520px;background:var(--surface);border-radius:24px 24px 0 0;
+  padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:16px;max-height:88vh;overflow-y:auto;
+}
+.sheet-handle{width:40px;height:4px;border-radius:2px;background:var(--border);margin:0 auto;}
+.sheet-title{font-family:'Jua','Noto Sans KR',sans-serif;font-size:19px;}
+.opt-grid{display:flex;flex-direction:column;gap:9px;}
+.opt-btn{
+  display:flex;align-items:center;gap:12px;padding:14px 14px;border-radius:var(--radius-m);
+  border:1.5px solid var(--border);background:var(--surface-2);cursor:pointer;text-align:left;
+}
+.opt-btn .dot{width:11px;height:11px;border-radius:50%;flex:none;}
+.opt-btn b{font-size:14.5px;}
+.opt-btn span{display:block;font-size:12px;color:var(--text-muted);margin-top:1px;}
+.opt-btn.sel{border-color:currentColor;}
+.opt-btn.opt-full{color:var(--available);}
+.opt-btn.opt-full.sel{background:var(--available-soft);}
+.opt-btn.opt-partial{color:var(--partial);}
+.opt-btn.opt-partial.sel{background:var(--partial-soft);}
+.opt-btn.opt-none{color:var(--unavailable);}
+.opt-btn.opt-none.sel{background:var(--unavailable-soft);}
+.opt-btn .dot{background:currentColor;}
+.hour-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+@media (min-width:420px){.hour-grid{grid-template-columns:repeat(4,1fr);}}
+.hour-chip{
+  padding:10px 4px;border-radius:var(--radius-s);border:1.5px solid var(--border);background:var(--surface-2);
+  color:var(--text);font-size:12.5px;font-family:'Baloo 2',monospace;cursor:pointer;text-align:center;
+}
+.hour-chip.on{background:var(--partial);border-color:var(--partial);color:#fff;}
+.sheet-actions{display:flex;gap:10px;}
+.sheet-actions .btn{flex:1;}
+.clear-link{text-align:center;font-size:12.5px;color:var(--text-muted);background:none;border:none;cursor:pointer;text-decoration:underline;}
+
+.admin-tabs{display:flex;gap:8px;padding:2px;background:var(--surface-2);border-radius:var(--radius-m);}
+.admin-tab{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 6px;border-radius:calc(var(--radius-m) - 4px);
+  border:none;background:transparent;color:var(--text-muted);font-weight:700;font-size:13px;cursor:pointer;
+}
+.admin-tab svg{width:16px;height:16px;}
+.admin-tab.active{background:var(--surface);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.count-pill{background:var(--unavailable);color:#fff;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 6px;}
+
+.notif-list{display:flex;flex-direction:column;gap:8px;}
+.notif-item{
+  display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--radius-m);
+  background:var(--surface);border:1px solid var(--border);cursor:pointer;
+}
+.notif-item.unread{border-color:var(--accent);background:var(--accent-soft);}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;}
+.notif-item.read .notif-dot{background:transparent;}
+.notif-body{flex:1;display:flex;flex-direction:column;gap:2px;}
+.notif-body b{font-size:14px;}
+.notif-body span{font-size:12px;color:var(--text-muted);}
+.notif-time{font-size:11.5px;color:var(--text-muted);font-family:'Baloo 2',monospace;flex:none;}
+.empty-note{text-align:center;color:var(--text-muted);font-size:13px;padding:40px 10px;}
+
+.mgr-list{display:flex;flex-direction:column;gap:8px;}
+.mgr-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;border-radius:var(--radius-m);background:var(--surface);border:1px solid var(--border);}
+.mgr-info{display:flex;flex-direction:column;gap:2px;}
+.mgr-info b{font-size:14px;}
+.mgr-info span{font-size:11.5px;color:var(--text-muted);}
+.mgr-del{background:none;border:1.5px solid var(--unavailable);color:var(--unavailable);font-size:12.5px;font-weight:700;padding:7px 12px;border-radius:var(--radius-s);cursor:pointer;flex:none;}
+.mgr-confirm{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--unavailable);flex:none;}
+.mgr-confirm button{border:none;border-radius:var(--radius-s);padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer;}
+.mgr-confirm .yes{background:var(--unavailable);color:#fff;}
+.mgr-confirm .no{background:var(--surface-2);color:var(--text);}
+.helper-note{font-size:11.5px;color:var(--text-muted);line-height:1.55;}
+
+.detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);padding:16px;display:flex;flex-direction:column;gap:12px;}
+.member-row{display:flex;align-items:center;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--border);}
+.member-row:last-child{border-bottom:none;}
+.member-row .mname{font-size:13.5px;font-weight:600;}
+.member-row .mstatus{font-size:12px;display:flex;align-items:center;gap:6px;}
+.member-row .mstatus i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.toast{
+  position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);
+  background:var(--text);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:13px;font-weight:600;
+  box-shadow:var(--shadow);z-index:60;
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+
+/* ================= netlify functions bridge =================
+ * 예전 Google Apps Script 버전의 google.script.run 대신, 같은 이름(gsRun)의
+ * 함수를 그대로 두고 내부 구현만 /.netlify/functions/api 로 보내는 fetch 호출로
+ * 바꿨습니다. 그래서 이 함수를 호출하는 나머지 코드는 전혀 손댈 필요가 없습니다. */
+function gsRun(fnName){
+  var args = Array.prototype.slice.call(arguments, 1);
+  return fetch("/.netlify/functions/api", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fn: fnName, args: args })
+  }).then(function(res){
+    return res.json().catch(function(){
+      throw new Error("서버 응답을 해석할 수 없습니다.");
+    }).then(function(json){
+      if(!res.ok || !json || json.ok===false){
+        throw new Error((json && json.error) || "요청에 실패했습니다.");
+      }
+      return json.data;
+    });
+  });
+}
+
+/* ================= constants ================= */
+var ADMIN_NAME = "임도혁";
+var ADMIN_PIN = "1234"; /* 화면 진입용 1차 확인. 실제 검증은 서버(Code.gs)에서도 다시 합니다. */
+var START_HOUR = 0, END_HOUR = 24; /* 00:00 ~ 24:00, 1-hour slots */
+var WEEKDAYS = ["일","월","화","수","목","금","토"];
+var MONTHS = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+
+function pad2(n){ return (n<10?"0":"")+n; }
+function hourLabel(h){ return pad2(h===24?24:h)+":00"; }
+function slotLabel(h){ return hourLabel(h)+"~"+hourLabel(h+1); }
+function dateKey(y,m,d){ return y+"-"+pad2(m+1)+"-"+pad2(d); }
+function todayKey(){ var t=new Date(); return dateKey(t.getFullYear(), t.getMonth(), t.getDate()); }
+function daysInMonth(y,m){ return new Date(y, m+1, 0).getDate(); }
+function firstWeekday(y,m){ return new Date(y, m, 1).getDay(); }
+function allHours(){ var a=[]; for(var h=START_HOUR;h<END_HOUR;h++) a.push(h); return a; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+function mergeRanges(hoursSorted){
+  var out=[]; var i=0;
+  while(i<hoursSorted.length){
+    var start=hoursSorted[i]; var end=start+1;
+    while(i+1<hoursSorted.length && hoursSorted[i+1]===end){ end++; i++; }
+    out.push(hourLabel(start)+"~"+hourLabel(end));
+    i++;
+  }
+  return out;
+}
+
+function relTime(ts){
+  var diff = Date.now()-ts;
+  var m = Math.floor(diff/60000);
+  if(m<1) return "방금 전";
+  if(m<60) return m+"분 전";
+  var h = Math.floor(m/60);
+  if(h<24) return h+"시간 전";
+  var d = Math.floor(h/24);
+  if(d<7) return d+"일 전";
+  var dt = new Date(ts);
+  return (dt.getMonth()+1)+"월 "+dt.getDate()+"일";
+}
+
+function hoursForDay(day){
+  if(!day || !day.status) return null;
+  if(day.status==="full") return new Set(allHours());
+  if(day.status==="none") return new Set();
+  if(day.status==="partial") return new Set(day.slots||[]);
+  return null;
+}
+
+/* ================= state ================= */
+var state = {
+  screen: "name",
+  nameInput: "",
+  nameErr: "",
+  pendingAdminName: "",
+  pin: "",
+  pinErr: "",
+  adminAuthPin: "",
+  loading: false,
+  member: null,
+  viewY: new Date().getFullYear(),
+  viewM: new Date().getMonth(),
+  quickJumpOpen: false,
+  qjYear: new Date().getFullYear(),
+  sheetDate: null,
+  sheetStatus: null,
+  sheetSlots: null,
+  sheetLastHour: null,
+  sheetMemo: "",
+  sheetErr: "",
+  toast: "",
+  adminTab: "inbox",
+  members: [],
+  notifs: [],
+  adminDetailDate: null,
+  deleteConfirmId: null,
+  adminPollTimer: null,
+  adminLoading: false,
+  adminViewMemberId: null,
+  adminMemberDetailDate: null
+};
+
+function setState(patch){
+  Object.assign(state, patch);
+  render();
+}
+
+function showToast(msg){
+  setState({toast: msg});
+  setTimeout(function(){ if(state.toast===msg) setState({toast:""}); }, 2200);
+}
+
+/* ================= name / entry ================= */
+function submitName(){
+  var raw = (state.nameInput||"").trim().replace(/\s+/g," ");
+  if(!raw){ setState({nameErr:"이름을 입력해주세요."}); return; }
+  if(raw.length>20){ setState({nameErr:"이름이 너무 깁니다."}); return; }
+  if(raw===ADMIN_NAME){
+    setState({screen:"adminChoice", pendingAdminName:raw, nameErr:""});
+    return;
+  }
+  enterAsMember(raw);
+}
+
+async function enterAsMember(name){
+  setState({loading:true});
+  try{
+    var data = await gsRun("api_getOrCreateMember", name);
+    setState({
+      screen:"calendar", loading:false,
+      member: { id: data.id, data: data },
+      viewY: new Date().getFullYear(), viewM: new Date().getMonth()
+    });
+  }catch(e){
+    setState({loading:false});
+    showToast("문제가 발생했습니다. 다시 시도해주세요.");
+  }
+}
+
+function stopAdminPolling(){
+  if(state.adminPollTimer){ clearInterval(state.adminPollTimer); state.adminPollTimer=null; }
+}
+
+function backToName(){
+  stopAdminPolling();
+  setState({
+    screen:"name", nameInput:"", nameErr:"", member:null,
+    members:[], notifs:[], pin:"", pinErr:"", adminAuthPin:""
+  });
+}
+
+/* ================= admin pin ================= */
+function submitPin(){
+  if(state.pin===ADMIN_PIN){
+    startAdmin();
+  } else {
+    setState({pinErr:"암호가 올바르지 않습니다.", pin:""});
+  }
+}
+
+async function startAdmin(){
+  var pin = state.pin;
+  setState({
+    screen:"admin", adminTab:"inbox", pin:"", pinErr:"", adminAuthPin: pin,
+    viewY:new Date().getFullYear(), viewM:new Date().getMonth(), adminLoading:true
+  });
+  await refreshAdminData();
+  stopAdminPolling();
+  state.adminPollTimer = setInterval(refreshAdminData, 20000);
+}
+
+async function refreshAdminData(){
+  try{
+    var results = await Promise.all([
+      gsRun("api_getAllMembers", state.adminAuthPin),
+      gsRun("api_getNotifications", state.adminAuthPin)
+    ]);
+    setState({members: results[0], notifs: results[1], adminLoading:false});
+  }catch(e){
+    setState({adminLoading:false});
+    /* 폴링 실패는 조용히 무시 (다음 주기에 재시도) */
+  }
+}
+
+async function markNotifRead(id){
+  try{ await gsRun("api_markNotifRead", state.adminAuthPin, id); await refreshAdminData(); }catch(e){}
+}
+async function markAllRead(){
+  try{ await gsRun("api_markAllRead", state.adminAuthPin); await refreshAdminData(); }catch(e){}
+}
+
+/* ================= member management (admin) ================= */
+async function deleteMember(id){
+  try{
+    await gsRun("api_deleteMember", state.adminAuthPin, id);
+    setState({deleteConfirmId:null});
+    await refreshAdminData();
+    showToast("멤버와 캘린더 기록을 삭제했습니다.");
+  }catch(e){
+    setState({deleteConfirmId:null});
+    showToast("삭제하지 못했습니다. 다시 시도해주세요.");
+  }
+}
+
+/* ================= month nav ================= */
+function shiftMonth(delta){
+  var m = state.viewM + delta, y = state.viewY;
+  if(m<0){ m=11; y--; } else if(m>11){ m=0; y++; }
+  setState({viewY:y, viewM:m});
+}
+function toggleQuickJump(){
+  setState({quickJumpOpen:!state.quickJumpOpen, qjYear: state.viewY});
+}
+function qjShiftYear(delta){ setState({qjYear: state.qjYear+delta}); }
+function qjPickMonth(m){ setState({viewY: state.qjYear, viewM: m, quickJumpOpen:false}); }
+
+/* ================= day sheet (member) ================= */
+function openSheet(dateStr){
+  var day = (state.member.data.days||{})[dateStr];
+  setState({
+    sheetDate: dateStr,
+    sheetStatus: day && day.status ? day.status : null,
+    sheetSlots: day && day.status==="partial" ? new Set(day.slots||[]) : new Set(),
+    sheetLastHour: null,
+    sheetMemo: day && day.memo ? day.memo : "",
+    sheetErr: ""
+  });
+}
+function closeSheet(){ setState({sheetDate:null, sheetErr:""}); }
+function pickStatus(st){ setState({sheetStatus:st, sheetErr:"", sheetLastHour:null}); }
+function toggleHour(h){
+  var s = new Set(state.sheetSlots);
+  var anchor = state.sheetLastHour;
+  if(anchor===null){
+    if(s.has(h)){ s.delete(h); setState({sheetSlots:s, sheetLastHour:null}); }
+    else { s.add(h); setState({sheetSlots:s, sheetLastHour:h}); }
+    return;
+  }
+  if(h===anchor){
+    /* 같은 칸을 다시 누르면 그 시간만 취소하고 기준점을 초기화 */
+    s.delete(h);
+    setState({sheetSlots:s, sheetLastHour:null});
+    return;
+  }
+  /* 이전에 누른 시간(anchor)부터 지금 누른 시간까지 구간 전체를 선택 */
+  var lo = Math.min(anchor, h), hi = Math.max(anchor, h);
+  for(var k=lo; k<=hi; k++) s.add(k);
+  /* 구간 선택을 완료했으니 기준점을 초기화합니다. 그래야 다음 클릭이
+     방금 만든 구간에 이어붙지 않고 새로운 구간으로 따로 시작됩니다.
+     (예: 11시~15시 선택 후 17시~22시를 선택해도 15~17시 사이는 비워짐) */
+  setState({sheetSlots:s, sheetLastHour:null});
+}
+async function saveSheet(){
+  if(!state.sheetStatus){ setState({sheetErr:"가능 여부를 선택해주세요."}); return; }
+  if(state.sheetStatus==="partial" && state.sheetSlots.size===0){
+    setState({sheetErr:"가능한 시간을 한 개 이상 선택해주세요."});
+    return;
+  }
+  var payload = {
+    status: state.sheetStatus,
+    slots: state.sheetStatus==="partial" ? Array.from(state.sheetSlots).sort(function(a,b){return a-b;}) : [],
+    memo: (state.sheetMemo||"").trim()
+  };
+  var dateStr = state.sheetDate;
+  var prevDays = state.member.data.days || {};
+  /* 낙관적 업데이트: 서버 응답을 기다리지 않고 바로 화면을 닫아 체감 지연을 줄입니다 */
+  var optimisticDays = Object.assign({}, prevDays);
+  optimisticDays[dateStr] = payload;
+  setState({
+    member: Object.assign({}, state.member, {data: Object.assign({}, state.member.data, {days:optimisticDays})}),
+    sheetDate:null, sheetMemo:""
+  });
+  try{
+    var res = await gsRun("api_saveDay", state.member.id, dateStr, payload);
+    setState({ member: Object.assign({}, state.member, {data: Object.assign({}, state.member.data, {days:res.days, updatedAt:res.updatedAt})}) });
+  }catch(e){
+    /* 저장 실패 시 되돌리고 다시 시도하도록 안내 */
+    setState({ member: Object.assign({}, state.member, {data: Object.assign({}, state.member.data, {days:prevDays})}) });
+    showToast("저장하지 못했습니다. 다시 시도해주세요.");
+  }
+}
+async function clearSheet(){
+  var dateStr = state.sheetDate;
+  var prevDays = state.member.data.days || {};
+  var optimisticDays = Object.assign({}, prevDays);
+  delete optimisticDays[dateStr];
+  setState({
+    member: Object.assign({}, state.member, {data: Object.assign({}, state.member.data, {days:optimisticDays})}),
+    sheetDate:null, sheetMemo:""
+  });
+  try{
+    var res = await gsRun("api_saveDay", state.member.id, dateStr, null);
+    setState({ member: Object.assign({}, state.member, {data: Object.assign({}, state.member.data, {days:res.days, updatedAt:res.updatedAt})}) });
+  }catch(e){
+    setState({ member: Object.assign({}, state.member, {data: Object.assign({}, state.member.data, {days:prevDays})}) });
+    showToast("삭제하지 못했습니다. 다시 시도해주세요.");
+  }
+}
+
+/* ================= complete ================= */
+async function completeEntry(){
+  var already = !!state.member.data.completed;
+  var prevData = state.member.data;
+  /* 낙관적 업데이트: 누르는 즉시 완료 표시 + 토스트를 보여주고, 서버 전송은 뒤에서 진행 */
+  setState({
+    member: Object.assign({}, state.member, {data: Object.assign({}, state.member.data, {completed:true, completedAt:Date.now()})})
+  });
+  showToast(already ? "변경사항을 다시 알렸습니다." : "완료되었습니다! 관리자에게 알림을 보냈어요.");
+  try{
+    var res = await gsRun("api_completeMember", state.member.id);
+    setState({
+      member: Object.assign({}, state.member, {data: Object.assign({}, state.member.data, {completed:true, completedAt:res.completedAt})})
+    });
+  }catch(e){
+    setState({ member: Object.assign({}, state.member, {data: prevData}) });
+    showToast("전송하지 못했습니다. 다시 시도해주세요.");
+  }
+}
+
+/* ================= common-calendar computation (admin) ================= */
+function commonForDate(dateStr){
+  var members = state.members;
+  var total = members.length;
+  var sets = [];
+  for(var i=0;i<members.length;i++){
+    var day = (members[i].days||{})[dateStr];
+    var hs = hoursForDay(day);
+    if(hs!==null) sets.push(hs);
+  }
+  var entered = sets.length;
+  if(entered===0) return {state:"empty", entered:0, total:total};
+  var common = allHours().filter(function(h){ return sets.every(function(s){ return s.has(h); }); });
+  if(common.length===0) return {state:"none", entered:entered, total:total};
+  var isFull = total>0 && entered===total;
+  return {state: isFull?"full":"partial", entered:entered, total:total, hours:common, ranges: mergeRanges(common)};
+}
+
+/* ================= icons ================= */
+var ICON_BELL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>';
+var ICON_CAL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+var ICON_CHEV_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
+var ICON_CHEV_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+var ICON_NOTE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>';
+var ICON_USERS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M22.5 21v-2a4 4 0 00-3-3.87"/><path d="M15.5 3.13a4 4 0 010 7.75"/></svg>';
+
+/* ================= render helpers ================= */
+function calendarGridHtml(y, m, cellBuilder){
+  var fw = firstWeekday(y,m);
+  var dim = daysInMonth(y,m);
+  var cells = [];
+  for(var i=0;i<fw;i++) cells.push('<div class="cal-cell empty"></div>');
+  for(var d=1; d<=dim; d++){
+    cells.push(cellBuilder(d, (fw + d - 1)%7));
+  }
+  var weekdayRow = '<div class="weekday-row">' + WEEKDAYS.map(function(w,i){
+    return '<div class="'+(i===0?"sun":i===6?"sat":"")+'">'+w+'</div>';
+  }).join("") + '</div>';
+  return weekdayRow + '<div class="cal-grid">' + cells.join("") + '</div>';
+}
+
+function quickJumpHtml(){
+  if(!state.quickJumpOpen) return "";
+  var months = MONTHS.map(function(name,i){
+    var active = (i===state.viewM && state.qjYear===state.viewY);
+    return '<button class="'+(active?"active":"")+'" data-act="qjmonth" data-m="'+i+'">'+name+'</button>';
+  }).join("");
+  return '<div class="quickjump">'+
+    '<div class="qj-year">'+
+      '<button class="nav-btn" data-act="qjyear" data-d="-1">'+ICON_CHEV_L+'</button>'+
+      '<b class="mono">'+state.qjYear+'년</b>'+
+      '<button class="nav-btn" data-act="qjyear" data-d="1">'+ICON_CHEV_R+'</button>'+
+    '</div>'+
+    '<div class="qj-grid">'+months+'</div>'+
+  '</div>';
+}
+
+/* ================= screens ================= */
+function screenName(){
+  return '' +
+  '<div class="center-screen">' +
+    '<div class="glow">'+ICON_NOTE+'</div>' +
+    '<div>' +
+      '<div class="hero-title">젤리합주일정잡기</div>' +
+      '<div class="hero-sub">이름을 입력하고 합주 가능한 날짜와 시간을 알려주세요. 모두의 입력이 모이면 공통으로 가능한 시간이 계산돼요.</div>' +
+    '</div>' +
+    '<div class="field">' +
+      '<input id="nameInput" type="text" placeholder="이름 (예: 홍길동)" value="'+esc(state.nameInput)+'" maxlength="20" autocomplete="off">' +
+    '</div>' +
+    '<div class="err-text">'+esc(state.nameErr)+'</div>' +
+    '<button class="btn btn-primary" data-act="submitName"'+(state.loading?' disabled':'')+'>'+(state.loading?'확인하는 중...':'시작하기')+'</button>' +
+  '</div>';
+}
+
+function screenAdminChoice(){
+  return '' +
+  '<div class="center-screen">' +
+    '<div class="glow">'+ICON_NOTE+'</div>' +
+    '<div class="hero-title">안녕하세요, '+esc(state.pendingAdminName)+'님</div>' +
+    '<div class="hero-sub">이번엔 무엇을 할까요?</div>' +
+    '<div class="btn-row">' +
+      '<button class="btn btn-primary" data-act="goMemberAsAdmin">내 합주 일정 입력하기</button>' +
+      '<button class="btn btn-outline" data-act="goPin">관리자 화면 보기 (공용 캘린더)</button>' +
+      '<button class="linklike" data-act="backToName">다른 이름으로 시작</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function screenPin(){
+  return '' +
+  '<div class="center-screen">' +
+    '<div class="hero-title">관리자 암호</div>' +
+    '<div class="hero-sub">공용 캘린더와 알림함을 보려면 암호를 입력하세요.</div>' +
+    '<div class="field">' +
+      '<input id="pinInput" type="password" inputmode="numeric" placeholder="암호" value="'+esc(state.pin)+'" maxlength="8">' +
+    '</div>' +
+    '<div class="err-text">'+esc(state.pinErr)+'</div>' +
+    '<div class="btn-row">' +
+      '<button class="btn btn-primary" data-act="submitPin">확인</button>' +
+      '<button class="linklike" data-act="cancelPin">뒤로</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function memberDayStatusClass(day){
+  if(!day || !day.status) return "";
+  return "st-"+day.status;
+}
+
+function screenCalendar(){
+  var m = state.member;
+  var days = m.data.days||{};
+  var y = state.viewY, mo = state.viewM;
+  var tk = todayKey();
+
+  var full=0, partial=0, total=0;
+  Object.keys(days).forEach(function(k){
+    var d = days[k]; if(!d||!d.status) return;
+    total++;
+    if(d.status==="full") full++; else if(d.status==="partial") partial++;
+  });
+
+  var grid = calendarGridHtml(y, mo, function(d, wd){
+    var key = dateKey(y,mo,d);
+    var day = days[key];
+    var cls = ["cal-cell"];
+    if(wd===0) cls.push("sun"); if(wd===6) cls.push("sat");
+    if(key===tk) cls.push("today");
+    var stCls = memberDayStatusClass(day);
+    if(stCls) cls.push(stCls);
+    var hrsHtml = "";
+    if(day && day.status==="partial" && day.slots && day.slots.length){
+      hrsHtml = '<div class="hrs mono">'+day.slots.length+'개 시간대</div>';
+    }
+    var memoMark = (day && day.memo) ? '<div class="hrs" style="font-size:9px;">📝</div>' : "";
+    return '<div class="'+cls.join(" ")+'" data-act="openDay" data-date="'+key+'">'+
+      '<div class="num">'+d+'</div>'+
+      (day && day.status ? '<div class="dot"></div>' : '')+
+      hrsHtml+memoMark+
+    '</div>';
+  });
+
+  return '' +
+  '<div class="screen">' +
+    '<div class="month-nav">' +
+      '<button class="nav-btn" data-act="prevMonth">'+ICON_CHEV_L+'</button>' +
+      '<button class="month-title" data-act="toggleQJ">'+y+'년 '+MONTHS[mo]+'</button>' +
+      '<button class="nav-btn" data-act="nextMonth">'+ICON_CHEV_R+'</button>' +
+    '</div>' +
+    quickJumpHtml() +
+    grid +
+    '<div class="legend">' +
+      '<span><i style="background:var(--available)"></i>종일 가능</span>' +
+      '<span><i style="background:var(--partial)"></i>일부 가능</span>' +
+      '<span>표시가 없으면 불가능한 날로 서로 이해해요</span>' +
+    '</div>' +
+    '<div class="summary-card">' +
+      '<div class="summary-row">' +
+        '<div>' +
+          '<b>'+esc(m.data.name)+'</b>님의 입력 현황' +
+        '</div>' +
+        '<span class="badge '+(m.data.completed?"done":"pending")+'">'+(m.data.completed?"완료됨":"입력 중")+'</span>' +
+      '</div>' +
+      '<div class="summary-stats">' +
+        '<div class="stat"><b class="mono">'+total+'</b><span>입력한 날짜</span></div>' +
+        '<div class="stat"><b class="mono" style="color:var(--available)">'+full+'</b><span>종일가능</span></div>' +
+        '<div class="stat"><b class="mono" style="color:var(--partial)">'+partial+'</b><span>일부가능</span></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>' +
+  '<div class="bottom-bar">' +
+    '<button class="btn btn-primary" data-act="complete">'+(m.data.completed?"변경사항 다시 알리기":"입력 완료 — 관리자에게 알리기")+'</button>' +
+  '</div>';
+}
+
+function screenSheet(){
+  if(!state.sheetDate) return "";
+  var d = new Date(state.sheetDate+"T00:00:00");
+  var title = (d.getMonth()+1)+"월 "+d.getDate()+"일 ("+WEEKDAYS[d.getDay()]+")";
+  var opts = [
+    {key:"full", label:"종일 가능", sub:"이 날은 언제든 좋아요", cls:"opt-full"},
+    {key:"partial", label:"일부 가능", sub:"가능한 시간대를 골라주세요", cls:"opt-partial"}
+  ];
+  var optsHtml = opts.map(function(o){
+    var sel = state.sheetStatus===o.key;
+    return '<button class="opt-btn '+o.cls+' '+(sel?"sel":"")+'" data-act="pickStatus" data-st="'+o.key+'">'+
+      '<span class="dot"></span><span><b>'+o.label+'</b><span>'+o.sub+'</span></span>'+
+    '</button>';
+  }).join("");
+
+  var hourGrid = "";
+  if(state.sheetStatus==="partial"){
+    var chips = allHours().map(function(h){
+      var on = state.sheetSlots.has(h);
+      return '<button class="hour-chip '+(on?"on":"")+'" data-act="toggleHour" data-h="'+h+'">'+hourLabel(h)+'</button>';
+    }).join("");
+    hourGrid = '<div class="helper-note">시작 시간을 누르고, 끝나는 시간을 누르면 그 사이가 한 번에 선택돼요. (예: 11:00 → 15:00 누르면 11시~15시 전체 선택). 새로운 시간대를 또 선택하려면 다른 시간을 눌러 새로 시작하면 돼요.</div><div class="hour-grid">'+chips+'</div>';
+  }
+
+  var hasEntry = !!( (state.member.data.days||{})[state.sheetDate] );
+
+  var memoField = '<div class="field">' +
+    '<label for="memoInput">특이사항 메모 (선택)</label>' +
+    '<textarea id="memoInput" rows="2" placeholder="예: 30분 늦게 도착, 중간에 잠깐 빠질 수 있어요 등">'+esc(state.sheetMemo)+'</textarea>' +
+  '</div>';
+
+  return '' +
+  '<div class="sheet-backdrop" data-act="closeSheetBackdrop">' +
+    '<div class="sheet" data-act="sheetNoop">' +
+      '<div class="sheet-handle"></div>' +
+      '<div class="sheet-title">'+title+'</div>' +
+      '<div class="opt-grid">'+optsHtml+'</div>' +
+      hourGrid +
+      memoField +
+      '<div class="err-text">'+esc(state.sheetErr)+'</div>' +
+      '<div class="sheet-actions">' +
+        '<button class="btn btn-ghost" data-act="closeSheet">취소</button>' +
+        '<button class="btn btn-primary" data-act="saveSheet">저장</button>' +
+      '</div>' +
+      (hasEntry ? '<button class="clear-link" data-act="clearSheet">이 날짜 입력 지우기</button>' : '') +
+    '</div>' +
+  '</div>';
+}
+
+function screenAdmin(){
+  var y=state.viewY, mo=state.viewM;
+  var unread = state.notifs.filter(function(n){return !n.read;}).length;
+
+  var body = "";
+  if(state.adminTab==="inbox"){
+    if(state.adminLoading && !state.notifs.length){
+      body = '<div class="empty-note">불러오는 중...</div>';
+    } else if(!state.notifs.length){
+      body = '<div class="empty-note">아직 완료 알림이 없습니다.</div>';
+    } else {
+      body = '<div style="display:flex;justify-content:flex-end;">'+
+        (unread? '<button class="linklike" data-act="markAllRead">모두 읽음</button>' : '')+
+      '</div><div class="notif-list">' + state.notifs.map(function(n){
+        var label = n.type==="update" ? "일정을 수정했어요" : "일정 입력을 완료했어요";
+        return '<div class="notif-item '+(n.read?"read":"unread")+'" data-act="readNotif" data-id="'+n.id+'">'+
+          '<span class="notif-dot"></span>'+
+          '<div class="notif-body"><b>'+esc(n.name)+'</b><span>'+label+'</span></div>'+
+          '<span class="notif-time">'+relTime(n.at)+'</span>'+
+        '</div>';
+      }).join("") + '</div>';
+    }
+  } else if(state.adminTab==="calendar") {
+    var grid = calendarGridHtml(y, mo, function(d, wd){
+      var key = dateKey(y,mo,d);
+      var res = commonForDate(key);
+      var cls = ["cal-cell"];
+      if(wd===0) cls.push("sun"); if(wd===6) cls.push("sat");
+      if(key===todayKey()) cls.push("today");
+      var inner = '<div class="num">'+d+'</div>';
+      if(res.state==="full"){
+        cls.push("common-hit");
+        inner += '<div class="common-label mono">'+res.ranges.join(", ")+'</div>';
+      } else if(res.state==="partial"){
+        cls.push("common-partial");
+        inner += '<div class="common-label mono">'+res.entered+'/'+res.total+'명</div>';
+      } else if(res.state==="none"){
+        cls.push("common-miss");
+        inner += '<div class="common-label mono">안겹침</div>';
+      }
+      return '<div class="'+cls.join(" ")+'" data-act="openAdminDay" data-date="'+key+'">'+inner+'</div>';
+    });
+    body = '' +
+      '<div class="month-nav">' +
+        '<button class="nav-btn" data-act="prevMonth">'+ICON_CHEV_L+'</button>' +
+        '<button class="month-title" data-act="toggleQJ">'+y+'년 '+MONTHS[mo]+'</button>' +
+        '<button class="nav-btn" data-act="nextMonth">'+ICON_CHEV_R+'</button>' +
+      '</div>' +
+      quickJumpHtml() +
+      grid +
+      '<div class="legend">' +
+        '<span><i style="background:var(--available-soft);border:2.5px solid var(--gold)"></i>등록된 전원 합주 가능</span>' +
+        '<span><i style="background:var(--partial-soft);border:2px solid var(--partial)"></i>일부만 입력·겹치는 시간 있음</span>' +
+        '<span><i style="background:var(--surface-2);border:1px solid var(--border)"></i>겹치는 시간 없음</span>' +
+      '</div>' +
+      '<div class="helper-note">"전원 합주 가능"은 지금 <b>멤버 관리</b> 탭에 있는 인원 수를 기준으로 계산돼요. 아직 입력 전인 멤버가 있으면 노란 테두리 대신 주황 테두리(일부 입력)로 표시되니, 인원이 확정되지 않았거나 탈퇴한 멤버가 있다면 멤버 관리 탭에서 정리해주세요. (20초마다 자동 새로고침됩니다)</div>' +
+      (state.adminDetailDate ? adminDayDetailHtml() : '');
+  } else {
+    if(state.adminViewMemberId){
+      body = adminMemberCalendarHtml();
+    } else {
+      body = '<div class="helper-note">현재 등록된 멤버 '+state.members.length+'명입니다. 이름을 누르면 그 멤버의 캘린더를 따로 볼 수 있어요. 잘못 등록되었거나 더 이상 밴드에 없는 멤버는 삭제할 수 있고, 삭제하면 그 멤버가 입력한 캘린더 기록도 함께 사라집니다.</div>' + membersManageHtml();
+    }
+  }
+
+  return '' +
+  '<div class="screen">' +
+    '<div class="admin-tabs">' +
+      '<button class="admin-tab '+(state.adminTab==="inbox"?"active":"")+'" data-act="adminTab" data-tab="inbox">'+ICON_BELL+' 알림함'+(unread?' <span class="count-pill">'+unread+'</span>':'')+'</button>' +
+      '<button class="admin-tab '+(state.adminTab==="calendar"?"active":"")+'" data-act="adminTab" data-tab="calendar">'+ICON_CAL+' 공용 캘린더</button>' +
+      '<button class="admin-tab '+(state.adminTab==="members"?"active":"")+'" data-act="adminTab" data-tab="members">'+ICON_USERS+' 멤버 관리</button>' +
+    '</div>' +
+    '<div style="font-size:12.5px;color:var(--text-muted)">현재 등록된 멤버 '+state.members.length+'명 · 완료 '+state.members.filter(function(m){return m.completed;}).length+'명</div>' +
+    body +
+  '</div>';
+}
+
+function membersManageHtml(){
+  if(state.adminLoading && !state.members.length) return '<div class="empty-note">불러오는 중...</div>';
+  if(!state.members.length) return '<div class="empty-note">등록된 멤버가 없습니다.</div>';
+  var sorted = state.members.slice().sort(function(a,b){ return (a.name||"").localeCompare(b.name||"","ko"); });
+  var rows = sorted.map(function(m){
+    var dayCount = Object.keys(m.days||{}).filter(function(k){ return m.days[k] && m.days[k].status; }).length;
+    var right;
+    if(state.deleteConfirmId===m.id){
+      right = '<div class="mgr-confirm"><span>삭제할까요?</span>'+
+        '<button class="no" data-act="cancelDeleteMember">취소</button>'+
+        '<button class="yes" data-act="confirmDeleteMember" data-id="'+m.id+'">삭제</button></div>';
+    } else {
+      right = '<button class="mgr-del" data-act="askDeleteMember" data-id="'+m.id+'">삭제</button>';
+    }
+    return '<div class="mgr-row"><div class="mgr-info" style="cursor:pointer;" data-act="viewMemberCalendar" data-id="'+m.id+'"><b>'+esc(m.name)+'</b><span>'+dayCount+'일 입력 · '+(m.completed?"완료":"입력 중")+' · 캘린더 보기</span></div>'+right+'</div>';
+  }).join("");
+  return '<div class="mgr-list">'+rows+'</div>';
+}
+
+function adminMemberCalendarHtml(){
+  var member = state.members.filter(function(m){ return m.id===state.adminViewMemberId; })[0];
+  if(!member){
+    return '<div class="empty-note">멤버를 찾을 수 없습니다. (삭제되었을 수 있어요)</div>'+
+      '<button class="linklike" data-act="backToMembersList">← 멤버 목록으로</button>';
+  }
+  var y=state.viewY, mo=state.viewM;
+  var days = member.days||{};
+
+  var grid = calendarGridHtml(y, mo, function(d, wd){
+    var key = dateKey(y,mo,d);
+    var day = days[key];
+    var cls = ["cal-cell"];
+    if(wd===0) cls.push("sun"); if(wd===6) cls.push("sat");
+    if(key===todayKey()) cls.push("today");
+    var stCls = memberDayStatusClass(day);
+    if(stCls) cls.push(stCls);
+    var hrsHtml = "";
+    if(day && day.status==="partial" && day.slots && day.slots.length){
+      var sorted = day.slots.slice().sort(function(a,b){return a-b;});
+      hrsHtml = '<div class="hrs mono">'+mergeRanges(sorted).join(", ")+'</div>';
+    }
+    var memoMark = (day && day.memo) ? '<div class="hrs" style="font-size:9px;">📝</div>' : "";
+    return '<div class="'+cls.join(" ")+'" data-act="openAdminMemberDay" data-date="'+key+'">'+
+      '<div class="num">'+d+'</div>'+
+      (day && day.status ? '<div class="dot"></div>' : '')+
+      hrsHtml+memoMark+
+    '</div>';
+  });
+
+  var detail = "";
+  if(state.adminMemberDetailDate){
+    var key2 = state.adminMemberDetailDate;
+    var dd = new Date(key2+"T00:00:00");
+    var title2 = (dd.getMonth()+1)+"월 "+dd.getDate()+"일 ("+WEEKDAYS[dd.getDay()]+")";
+    var day2 = days[key2];
+    var body2;
+    if(!day2 || !day2.status){ body2 = "입력 없음"; }
+    else if(day2.status==="full"){ body2 = "종일 가능"; }
+    else { body2 = "일부 가능 ("+mergeRanges((day2.slots||[]).slice().sort(function(a,b){return a-b;})).join(", ")+")"; }
+    var memoHtml = (day2 && day2.memo) ? '<div style="font-size:13px;color:var(--text-muted);white-space:pre-wrap;margin-top:4px;">📝 '+esc(day2.memo)+'</div>' : "";
+    detail = '<div class="detail-card">'+
+      '<div class="summary-row"><b>'+title2+'</b><button class="linklike" data-act="closeAdminMemberDay">닫기</button></div>'+
+      '<div style="font-size:13.5px;">'+body2+'</div>'+
+      memoHtml+
+    '</div>';
+  }
+
+  return '' +
+    '<div class="summary-row">' +
+      '<button class="linklike" data-act="backToMembersList">← 멤버 목록으로</button>' +
+    '</div>' +
+    '<div class="month-nav">' +
+      '<button class="nav-btn" data-act="prevMonth">'+ICON_CHEV_L+'</button>' +
+      '<button class="month-title" data-act="toggleQJ">'+y+'년 '+MONTHS[mo]+'</button>' +
+      '<button class="nav-btn" data-act="nextMonth">'+ICON_CHEV_R+'</button>' +
+    '</div>' +
+    quickJumpHtml() +
+    '<div class="detail-card" style="padding:12px 16px;flex-direction:row;align-items:center;justify-content:space-between;">' +
+      '<b>'+esc(member.name)+'</b>님의 캘린더' +
+      '<span class="badge '+(member.completed?"done":"pending")+'">'+(member.completed?"완료됨":"입력 중")+'</span>' +
+    '</div>' +
+    grid +
+    '<div class="legend">' +
+      '<span><i style="background:var(--available)"></i>종일 가능</span>' +
+      '<span><i style="background:var(--partial)"></i>일부 가능</span>' +
+      '<span>📝 메모 있음</span>' +
+    '</div>' +
+    detail;
+}
+
+function adminDayDetailHtml(){
+  var key = state.adminDetailDate;
+  var d = new Date(key+"T00:00:00");
+  var title = (d.getMonth()+1)+"월 "+d.getDate()+"일 ("+WEEKDAYS[d.getDay()]+")";
+  var res = commonForDate(key);
+  var summary = "";
+  if(res.state==="empty") summary = "아직 입력한 멤버가 없습니다. (등록 멤버 "+res.total+"명)";
+  else if(res.state==="none") summary = res.entered+"/"+res.total+"명이 입력했지만 겹치는 시간이 없습니다.";
+  else if(res.state==="partial") summary = res.entered+"/"+res.total+"명 가능: " + res.ranges.join(", ") + " — 아직 전원이 입력하지 않았어요.";
+  else summary = "등록된 전원("+res.total+"명) 가능 시간: " + res.ranges.join(", ");
+
+  var rows = state.members.map(function(m){
+    var day = (m.days||{})[key];
+    var color = "var(--text-muted)", label="입력 없음";
+    if(day && day.status==="full"){ color="var(--available)"; label="종일 가능"; }
+    else if(day && day.status==="partial"){
+      color="var(--partial)";
+      var sortedSlots = (day.slots||[]).slice().sort(function(a,b){return a-b;});
+      label = sortedSlots.length ? "일부 가능 ("+mergeRanges(sortedSlots).join(", ")+")" : "일부 가능";
+    }
+    var memoRow = (day && day.memo) ? '<div style="font-size:11.5px;color:var(--text-muted);padding:0 2px 8px;">📝 '+esc(day.memo)+'</div>' : "";
+    return '<div class="member-row"><span class="mname">'+esc(m.name)+'</span><span class="mstatus"><i style="background:'+color+'"></i>'+label+'</span></div>'+memoRow;
+  }).join("");
+
+  return '<div class="detail-card">' +
+    '<div class="summary-row"><b>'+title+'</b><button class="linklike" data-act="closeAdminDay">닫기</button></div>' +
+    '<div style="font-size:13.5px;">'+summary+'</div>' +
+    rows +
+  '</div>';
+}
+
+/* ================= root render ================= */
+function topbarHtml(){
+  if(state.screen==="name"||state.screen==="adminChoice"||state.screen==="pin") return "";
+  var who = state.screen==="admin" ? ADMIN_NAME+" · 관리자" : (state.member ? state.member.data.name : "");
+  return '<div class="topbar">' +
+    '<div class="brand"><b>젤리합주일정잡기</b><span>자동으로 저장돼요 🎶</span></div>' +
+    '<div class="who"><span class="tag">'+esc(who)+'</span><button class="linklike" data-act="backToName">나가기</button></div>' +
+  '</div>';
+}
+
+function render(){
+  var html = topbarHtml();
+  if(state.screen==="name") html += screenName();
+  else if(state.screen==="adminChoice") html += screenAdminChoice();
+  else if(state.screen==="pin") html += screenPin();
+  else if(state.screen==="calendar" && state.member) html += screenCalendar();
+  else if(state.screen==="admin") html += screenAdmin();
+
+  html += screenSheet();
+  if(state.toast) html += '<div class="toast">'+esc(state.toast)+'</div>';
+
+  var app = document.getElementById("app");
+  app.innerHTML = html;
+
+  var nameInput = document.getElementById("nameInput");
+  if(nameInput){
+    nameInput.focus();
+    var v = nameInput.value; nameInput.value=""; nameInput.value=v;
+  }
+  var pinInput = document.getElementById("pinInput");
+  if(pinInput){ pinInput.focus(); }
+  var memoInput = document.getElementById("memoInput");
+  if(memoInput){
+    var mv = memoInput.value; memoInput.value=""; memoInput.value=mv;
+  }
+}
+
+/* ================= event delegation ================= */
+document.addEventListener("click", function(e){
+  var el = e.target.closest("[data-act]");
+  if(!el) return;
+  var act = el.getAttribute("data-act");
+  switch(act){
+    case "submitName": submitName(); break;
+    case "backToName": backToName(); break;
+    case "goMemberAsAdmin": enterAsMember(state.pendingAdminName); break;
+    case "goPin": setState({screen:"pin", pin:"", pinErr:""}); break;
+    case "cancelPin": setState({screen:"adminChoice"}); break;
+    case "submitPin": submitPin(); break;
+    case "prevMonth": shiftMonth(-1); break;
+    case "nextMonth": shiftMonth(1); break;
+    case "toggleQJ": toggleQuickJump(); break;
+    case "qjyear": qjShiftYear(parseInt(el.getAttribute("data-d"),10)); break;
+    case "qjmonth": qjPickMonth(parseInt(el.getAttribute("data-m"),10)); break;
+    case "openDay": openSheet(el.getAttribute("data-date")); break;
+    case "closeSheet": closeSheet(); break;
+    case "closeSheetBackdrop": closeSheet(); break;
+    case "pickStatus": pickStatus(el.getAttribute("data-st")); break;
+    case "toggleHour": toggleHour(parseInt(el.getAttribute("data-h"),10)); break;
+    case "saveSheet": saveSheet(); break;
+    case "clearSheet": clearSheet(); break;
+    case "complete": completeEntry(); break;
+    case "adminTab": setState({adminTab:el.getAttribute("data-tab"), adminDetailDate:null, deleteConfirmId:null, adminViewMemberId:null, adminMemberDetailDate:null}); if(el.getAttribute("data-tab")!=="inbox") refreshAdminData(); break;
+    case "readNotif": markNotifRead(el.getAttribute("data-id")); break;
+    case "markAllRead": markAllRead(); break;
+    case "openAdminDay": setState({adminDetailDate: el.getAttribute("data-date")}); break;
+    case "closeAdminDay": setState({adminDetailDate:null}); break;
+    case "askDeleteMember": setState({deleteConfirmId: el.getAttribute("data-id")}); break;
+    case "cancelDeleteMember": setState({deleteConfirmId:null}); break;
+    case "confirmDeleteMember": deleteMember(el.getAttribute("data-id")); break;
+    case "viewMemberCalendar": setState({adminViewMemberId: el.getAttribute("data-id"), adminMemberDetailDate:null}); break;
+    case "backToMembersList": setState({adminViewMemberId:null, adminMemberDetailDate:null}); break;
+    case "openAdminMemberDay": setState({adminMemberDetailDate: el.getAttribute("data-date")}); break;
+    case "closeAdminMemberDay": setState({adminMemberDetailDate:null}); break;
+    case "sheetNoop": break;
+  }
+});
+
+document.addEventListener("input", function(e){
+  if(e.target.id==="nameInput") state.nameInput = e.target.value;
+  if(e.target.id==="pinInput") state.pin = e.target.value;
+  if(e.target.id==="memoInput") state.sheetMemo = e.target.value;
+});
+document.addEventListener("keydown", function(e){
+  if(e.key==="Enter"){
+    if(e.target.id==="nameInput") submitName();
+    if(e.target.id==="pinInput") submitPin();
+  }
+});
+
+render();
+})();
+</script>
+</body>
+</html>
