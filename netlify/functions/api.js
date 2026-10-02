@@ -217,7 +217,8 @@ exports.handler = async function (event) {
   }
   try {
     connectLambda(event); /* 이 형식(exports.handler)의 함수에서 Netlify Blobs를 쓰려면 먼저 호출해야 합니다 */
-    const store = getStore({ name: STORE_NAME });
+    /* consistency: "strong" - 저장 직후 바로 읽어도 최신 값이 보이도록 (기본값은 최대 60초 지연) */
+    const store = getStore({ name: STORE_NAME, consistency: "strong" });
     const result = await handler(store, args);
     return {
       statusCode: 200,
