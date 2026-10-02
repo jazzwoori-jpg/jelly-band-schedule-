@@ -2,6 +2,7 @@
   "name": "jelly-band-schedule",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "젤리합주일정잡기 - Netlify Functions + Blobs backend",
   "dependencies": {
     "@netlify/blobs": "^8.1.0"
