@@ -10,7 +10,7 @@
  * 함수 이름은 기존 Code.gs(api_getOrCreateMember 등)와 동일하게 맞춰서,
  * 프론트 쪽 호출 코드는 거의 그대로 재사용할 수 있게 했습니다.
  */
-const { getStore, connectLambda } = require("@netlify/blobs");
+import { getStore } from "@netlify/blobs";
 
 const ADMIN_PIN = process.env.ADMIN_PIN || "1234"; // 관리자 암호 - Netlify 사이트 환경변수 ADMIN_PIN 으로 덮어쓸 수 있습니다.
 const STORE_NAME = "band-schedule";
@@ -187,49 +187,36 @@ const handlers = {
   },
 };
 
-exports.handler = async function (event) {
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: false, error: "Method not allowed" }),
-    };
+function jsonResponse(obj, status) {
+  return new Response(JSON.stringify(obj), {
+    status: status || 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+/* Netlify Functions 2.0 형식 (export default). 주소는 그대로 /.netlify/functions/api 입니다. */
+export default async function (req) {
+  if (req.method !== "POST") {
+    return jsonResponse({ ok: false, error: "Method not allowed" }, 405);
   }
   var body;
   try {
-    body = JSON.parse(event.body || "{}");
+    body = await req.json();
   } catch (e) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: false, error: "잘못된 요청입니다." }),
-    };
+    return jsonResponse({ ok: false, error: "잘못된 요청입니다." }, 400);
   }
-  var fn = body.fn;
-  var args = body.args || [];
+  var fn = body && body.fn;
+  var args = (body && body.args) || [];
   var handler = handlers[fn];
   if (!handler) {
-    return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: false, error: "알 수 없는 요청입니다: " + fn }),
-    };
+    return jsonResponse({ ok: false, error: "알 수 없는 요청입니다: " + fn }, 400);
   }
   try {
-    connectLambda(event); /* 이 형식(exports.handler)의 함수에서 Netlify Blobs를 쓰려면 먼저 호출해야 합니다 */
     /* consistency: "strong" - 저장 직후 바로 읽어도 최신 값이 보이도록 (기본값은 최대 60초 지연) */
     const store = getStore({ name: STORE_NAME, consistency: "strong" });
     const result = await handler(store, args);
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: true, data: result }),
-    };
+    return jsonResponse({ ok: true, data: result }, 200);
   } catch (e) {
-    return {
-      statusCode: e.statusCode || 500,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ok: false, error: e.message || "서버 오류가 발생했습니다." }),
-    };
+    return jsonResponse({ ok: false, error: e.message || "서버 오류가 발생했습니다." }, e.statusCode || 500);
   }
-};
+}
